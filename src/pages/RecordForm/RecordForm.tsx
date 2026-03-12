@@ -219,13 +219,19 @@ export function RecordForm() {
                   setPreparingAiFile(true)
                   setError('')
                   try {
-                    const res = await fetch(coverUrl)
+                    const res = await fetch(coverUrl, { mode: 'cors' })
                     if (!res.ok) throw new Error('Не удалось загрузить изображение')
                     const blob = await res.blob()
                     const file = new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' })
                     aiDetectMutation.mutate(file)
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : isEn ? 'Failed to load image' : 'Не удалось загрузить изображение')
+                  } catch {
+                    setError(
+                      isEn
+                        ? 'Cannot load image from server (e.g. CORS). Please select the cover file manually for AI.'
+                        : 'Не удалось загрузить изображение с сервера. Выберите файл обложки вручную для распознавания.'
+                    )
+                    coverModeRef.current = 'ai'
+                    setTimeout(() => fileInputRef.current?.click(), 100)
                   } finally {
                     setPreparingAiFile(false)
                   }
