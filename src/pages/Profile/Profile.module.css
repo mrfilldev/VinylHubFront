@@ -14,7 +14,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+  }
 }
 
 .headActions {

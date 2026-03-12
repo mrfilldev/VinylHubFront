@@ -49,14 +49,14 @@ export function Header() {
             <span className={styles.navIcon} aria-hidden>
               <Icon />
             </span>
-            {label}
+            <span className={styles.navLabel}>{label}</span>
           </Link>
         )})}
       </nav>
       <div className={styles.actions}>
         <Link to="/profile" className={styles.user}>
           <FiUser className={styles.userIcon} size={18} aria-hidden />
-          {user?.username ?? '…'}
+          <span className={styles.userName}>{user?.username ?? '…'}</span>
         </Link>
       </div>
     </header>

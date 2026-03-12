@@ -4,6 +4,14 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    padding: 16px;
+  }
 }
 
 .card {

@@ -168,6 +168,7 @@ export const api = {
         label?: string
         genre?: string
         condition?: string
+        notes?: string
       }>('/api/v1/vinyl/ai-detect', {
         method: 'POST',
         body: fd,

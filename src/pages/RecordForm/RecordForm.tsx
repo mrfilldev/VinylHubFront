@@ -37,6 +37,7 @@ export function RecordForm() {
   const isEn = lang === 'en'
 
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
   const [form, setForm] = useState<VinylCreate & { coverFile?: File }>({
     artist: '',
     title: '',
@@ -52,6 +53,7 @@ export function RecordForm() {
 
   useEffect(() => {
     if (!record) return
+    setCoverFile(null)
     setForm({
       artist: record.artist,
       title: record.title,
@@ -108,6 +110,7 @@ export function RecordForm() {
         label: data.label ?? f.label,
         genre: data.genre ?? f.genre,
         condition: data.condition ?? f.condition,
+        notes: data.notes ?? f.notes,
       }))
       setError('')
     },
@@ -148,6 +151,7 @@ export function RecordForm() {
       e.target.value = ''
       return
     }
+    setCoverFile(file)
     if (coverModeRef.current === 'uploadOnly') {
       uploadCoverMutation.mutate(file)
     } else {
@@ -206,8 +210,12 @@ export function RecordForm() {
               type="button"
               className={styles.aiBtn}
               onClick={() => {
-                coverModeRef.current = 'ai'
-                fileInputRef.current?.click()
+                if (coverFile) {
+                  aiDetectMutation.mutate(coverFile)
+                } else {
+                  coverModeRef.current = 'ai'
+                  fileInputRef.current?.click()
+                }
               }}
               disabled={aiDetectMutation.isPending || uploadCoverMutation.isPending}
             >
@@ -215,8 +223,8 @@ export function RecordForm() {
             </button>
             <p className={styles.coverHint}>
               {isEn
-                ? 'Click the area above to upload a cover, or use AI to auto-fill the form'
-                : 'Нажмите на область выше, чтобы загрузить обложку и заполнить вручную, или нажмите кнопку AI для автозаполнения'}
+                ? 'Upload a cover above, then use "Auto-fill (AI)" to recognize it — or choose a new file for AI'
+                : 'Загрузите обложку выше, затем нажмите «Автозаполнение (AI)» для распознавания — или выберите новый файл'}
             </p>
           </div>
 

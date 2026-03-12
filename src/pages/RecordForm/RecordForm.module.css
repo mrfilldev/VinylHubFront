@@ -54,6 +54,37 @@
   .layout {
     grid-template-columns: 1fr;
   }
+
+  .coverSection {
+    position: static;
+  }
+
+  .coverPreview {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .coverPreview {
+    min-height: 160px;
+  }
+
+  .aiBtn,
+  .submit {
+    min-height: 44px;
+  }
 }
 
 .coverSection {
