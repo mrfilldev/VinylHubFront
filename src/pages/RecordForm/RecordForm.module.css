@@ -1,5 +1,10 @@
 .wrap {
   padding: 0 0 24px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .back {
@@ -34,6 +39,12 @@
   padding: 24px;
   border: 1px solid var(--border);
   max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .title {
@@ -48,6 +59,7 @@
   grid-template-columns: 200px 1fr;
   gap: 28px;
   align-items: start;
+  min-width: 0;
 }
 
 @media (max-width: 560px) {
@@ -172,6 +184,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  min-width: 0;
 }
 
 .label {
@@ -180,15 +193,20 @@
   gap: 6px;
   font-size: 0.9rem;
   color: var(--text-primary);
+  min-width: 0;
 }
 
 .input,
 .textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 10px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
+  box-sizing: border-box;
 }
 
 .input:focus,

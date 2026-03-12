@@ -38,6 +38,7 @@ export function RecordForm() {
 
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [preparingAiFile, setPreparingAiFile] = useState(false)
   const [form, setForm] = useState<VinylCreate & { coverFile?: File }>({
     artist: '',
     title: '',
@@ -209,22 +210,38 @@ export function RecordForm() {
             <button
               type="button"
               className={styles.aiBtn}
-              onClick={() => {
+              onClick={async () => {
                 if (coverFile) {
                   aiDetectMutation.mutate(coverFile)
-                } else {
-                  coverModeRef.current = 'ai'
-                  fileInputRef.current?.click()
+                  return
                 }
+                if (coverUrl) {
+                  setPreparingAiFile(true)
+                  setError('')
+                  try {
+                    const res = await fetch(coverUrl)
+                    if (!res.ok) throw new Error('Не удалось загрузить изображение')
+                    const blob = await res.blob()
+                    const file = new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' })
+                    aiDetectMutation.mutate(file)
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : isEn ? 'Failed to load image' : 'Не удалось загрузить изображение')
+                  } finally {
+                    setPreparingAiFile(false)
+                  }
+                  return
+                }
+                coverModeRef.current = 'ai'
+                fileInputRef.current?.click()
               }}
-              disabled={aiDetectMutation.isPending || uploadCoverMutation.isPending}
+              disabled={aiDetectMutation.isPending || uploadCoverMutation.isPending || preparingAiFile}
             >
-              {isEn ? 'Auto-fill (AI)' : 'Автозаполнение (AI)'}
+              {preparingAiFile ? (isEn ? 'Preparing…' : 'Подготовка…') : isEn ? 'Auto-fill (AI)' : 'Автозаполнение (AI)'}
             </button>
             <p className={styles.coverHint}>
               {isEn
-                ? 'Upload a cover above, then use "Auto-fill (AI)" to recognize it — or choose a new file for AI'
-                : 'Загрузите обложку выше, затем нажмите «Автозаполнение (AI)» для распознавания — или выберите новый файл'}
+                ? 'Upload a cover or use the one above, then "Auto-fill (AI)" to recognize'
+                : 'Загрузите обложку или используйте текущую — кнопка «Автозаполнение (AI)» распознает её'}
             </p>
           </div>
 
