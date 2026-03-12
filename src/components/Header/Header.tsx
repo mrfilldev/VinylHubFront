@@ -28,7 +28,7 @@ export function Header() {
     <header className={styles.header}>
       <Link to="/" className={styles.logo}>
         <span className={styles.logoIcon} aria-hidden />
-        <span>VinylHub</span>
+        <span className={styles.logoText}>VinylHub</span>
       </Link>
       <nav className={styles.nav}>
         {nav.map(({ to, key, Icon }) => {

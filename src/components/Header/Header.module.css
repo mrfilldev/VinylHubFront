@@ -11,9 +11,15 @@
 
 @media (max-width: 640px) {
   .header {
-    gap: 8px;
-    padding: 10px 16px;
-    padding-left: max(16px, env(safe-area-inset-left));
+    gap: 6px;
+    padding: 8px 12px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .logoText {
+    display: none;
   }
 }
 
@@ -43,6 +49,10 @@
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 3v2M12 19v2M3 12h2M19 12h2'/%3E%3C/svg%3E") center/contain no-repeat;
 }
 
+.logoText {
+  white-space: nowrap;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -68,7 +78,9 @@
 
 @media (max-width: 640px) {
   .nav a {
-    padding: 8px 10px;
+    padding: 6px 8px;
+    min-height: 40px;
+    min-width: 40px;
     font-size: 0.8rem;
   }
 
@@ -103,6 +115,7 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .user {
@@ -115,11 +128,18 @@
   color: var(--text-primary);
   text-decoration: none;
   font-size: 0.95rem;
+  min-width: 0;
 }
 
 @media (max-width: 640px) {
+  .user {
+    padding: 6px 0;
+    min-height: 40px;
+    gap: 4px;
+  }
+
   .userName {
-    max-width: 80px;
+    max-width: 72px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
