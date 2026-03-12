@@ -10,7 +10,6 @@ export function RecordForm() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const coverModeRef = useRef<'ai' | 'uploadOnly'>('uploadOnly')
 
   const isEdit = !!id
 
@@ -37,8 +36,6 @@ export function RecordForm() {
   const isEn = lang === 'en'
 
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
-  const [coverFile, setCoverFile] = useState<File | null>(null)
-  const [preparingAiFile, setPreparingAiFile] = useState(false)
   const [form, setForm] = useState<VinylCreate & { coverFile?: File }>({
     artist: '',
     title: '',
@@ -54,7 +51,6 @@ export function RecordForm() {
 
   useEffect(() => {
     if (!record) return
-    setCoverFile(null)
     setForm({
       artist: record.artist,
       title: record.title,
@@ -98,28 +94,6 @@ export function RecordForm() {
     onError: (err: Error) => setError(err.message),
   })
 
-  const aiDetectMutation = useMutation({
-    mutationFn: (file: File) => api.vinyl.aiDetect(file),
-    onSuccess: (data) => {
-      setCoverUrl(getStaticUrl(data.cover_image_url))
-      setForm((f) => ({
-        ...f,
-        cover_image_url: data.cover_image_url,
-        artist: data.artist ?? f.artist,
-        title: data.title ?? f.title,
-        year: data.year ?? f.year,
-        label: data.label ?? f.label,
-        genre: data.genre ?? f.genre,
-        condition: data.condition ?? f.condition,
-        notes: data.notes ?? f.notes,
-      }))
-      setError('')
-    },
-    onError: (_err: Error, file: File) => {
-      uploadCoverMutation.mutate(file)
-    },
-  })
-
   if (isEdit && isLoading) {
     return (
       <div className={styles.wrap}>
@@ -152,13 +126,7 @@ export function RecordForm() {
       e.target.value = ''
       return
     }
-    setCoverFile(file)
-    if (coverModeRef.current === 'uploadOnly') {
-      uploadCoverMutation.mutate(file)
-    } else {
-      aiDetectMutation.mutate(file)
-    }
-    coverModeRef.current = 'uploadOnly'
+    uploadCoverMutation.mutate(file)
     e.target.value = ''
   }
 
@@ -185,12 +153,11 @@ export function RecordForm() {
             <div
               className={styles.coverPreview}
               onClick={() => {
-                if (aiDetectMutation.isPending || uploadCoverMutation.isPending) return
-                coverModeRef.current = 'uploadOnly'
+                if (uploadCoverMutation.isPending) return
                 fileInputRef.current?.click()
               }}
             >
-              {aiDetectMutation.isPending || uploadCoverMutation.isPending ? (
+              {uploadCoverMutation.isPending ? (
                 <span className={styles.coverPlaceholder}>{isEn ? 'Loading…' : 'Загрузка…'}</span>
               ) : coverUrl ? (
                 <img src={coverUrl} alt="" />
@@ -207,48 +174,6 @@ export function RecordForm() {
               className={styles.hidden}
               onChange={handleCoverChange}
             />
-            <button
-              type="button"
-              className={styles.aiBtn}
-              onClick={async () => {
-                if (coverFile) {
-                  aiDetectMutation.mutate(coverFile)
-                  return
-                }
-                if (coverUrl) {
-                  setPreparingAiFile(true)
-                  setError('')
-                  try {
-                    const res = await fetch(coverUrl, { mode: 'cors' })
-                    if (!res.ok) throw new Error('Не удалось загрузить изображение')
-                    const blob = await res.blob()
-                    const file = new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' })
-                    aiDetectMutation.mutate(file)
-                  } catch {
-                    setError(
-                      isEn
-                        ? 'Cannot load image from server (e.g. CORS). Please select the cover file manually for AI.'
-                        : 'Не удалось загрузить изображение с сервера. Выберите файл обложки вручную для распознавания.'
-                    )
-                    coverModeRef.current = 'ai'
-                    setTimeout(() => fileInputRef.current?.click(), 100)
-                  } finally {
-                    setPreparingAiFile(false)
-                  }
-                  return
-                }
-                coverModeRef.current = 'ai'
-                fileInputRef.current?.click()
-              }}
-              disabled={aiDetectMutation.isPending || uploadCoverMutation.isPending || preparingAiFile}
-            >
-              {preparingAiFile ? (isEn ? 'Preparing…' : 'Подготовка…') : isEn ? 'Auto-fill (AI)' : 'Автозаполнение (AI)'}
-            </button>
-            <p className={styles.coverHint}>
-              {isEn
-                ? 'Upload a cover or use the one above, then "Auto-fill (AI)" to recognize'
-                : 'Загрузите обложку или используйте текущую — кнопка «Автозаполнение (AI)» распознает её'}
-            </p>
           </div>
 
           <div className={styles.formWrap}>
