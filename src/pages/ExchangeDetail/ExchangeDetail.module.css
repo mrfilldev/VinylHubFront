@@ -2,6 +2,18 @@
   padding: 0 0 24px;
 }
 
+.back {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
 .title {
   margin: 0 0 24px;
   font-size: 1.5rem;
@@ -9,10 +21,15 @@
   color: var(--text-primary);
 }
 
+.error {
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+
 .spinner {
   width: 48px;
   height: 48px;
-  margin: 80px auto;
+  margin: 48px auto;
   border: 4px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
@@ -23,121 +40,32 @@
   to { transform: rotate(360deg); }
 }
 
-.placeholder {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 48px 24px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-
-.placeholder p {
-  margin: 0 0 8px;
-  color: var(--text-primary);
-}
-
-.hint {
-  font-size: 0.9rem;
-  color: var(--text-secondary) !important;
-}
-
-.subtitle {
-  margin: 0 0 20px;
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.tab,
-.tabActive {
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tab:hover {
-  border-color: var(--accent);
-}
-
-.tabActive {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #0f1419;
-}
-
-.badge {
-  background: var(--danger, #ef4444);
-  color: #fff;
-  font-size: 0.75rem;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-}
-
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .card {
   background: var(--bg-card);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  overflow: hidden;
-}
-
-.cardContent {
-  width: 100%;
-  padding: 20px;
-  text-align: left;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
-}
-
-.cardContent:hover {
-  background: var(--bg-secondary);
+  padding: 24px;
 }
 
 .vinyls {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .vinylBlock {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex: 1;
   min-width: 0;
 }
 
 .vinylCover {
-  width: 56px;
-  height: 56px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--bg-secondary);
@@ -153,7 +81,7 @@
 .vinylPlaceholder {
   width: 100%;
   height: 100%;
-  padding: 12px;
+  padding: 16px;
   color: var(--text-secondary);
   box-sizing: border-box;
 }
@@ -161,49 +89,45 @@
 .vinylInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
 .vinylLabel {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
 .vinylArtist {
   font-weight: 600;
+  font-size: 1.1rem;
   color: var(--text-primary);
 }
 
 .vinylTitle {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
 }
 
 .arrow {
   color: var(--accent);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   flex-shrink: 0;
 }
 
 .meta {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  margin-bottom: 16px;
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
-.users {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
 .statusBadge {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
@@ -229,11 +153,12 @@
 .actions {
   display: flex;
   gap: 12px;
-  padding: 0 20px 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
 
 .acceptBtn {
-  padding: 8px 20px;
+  padding: 10px 24px;
   background: #22c55e;
   color: #fff;
   border: none;
@@ -247,7 +172,7 @@
 }
 
 .rejectBtn {
-  padding: 8px 20px;
+  padding: 10px 24px;
   background: var(--danger, #ef4444);
   color: #fff;
   border: none;
@@ -264,31 +189,4 @@
 .rejectBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.empty {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 48px 24px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-
-.empty p {
-  margin: 0 0 16px;
-  color: var(--text-primary);
-}
-
-.empty a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.empty a:hover {
-  text-decoration: underline;
-}
-
-.error {
-  color: var(--danger);
-  margin-bottom: 12px;
 }

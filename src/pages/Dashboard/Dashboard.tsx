@@ -78,13 +78,15 @@ export function Dashboard() {
             {isEn ? 'Friends' : 'Друзей'}
           </span>
         </div>
-        <div className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.statOrange}`} aria-hidden><FiRepeat size={20} /></span>
-          <span className={styles.statValue}>{stats.exchanges_count}</span>
-          <span className={styles.statLabel}>
-            {isEn ? 'Active exchanges' : 'Активных обменов'}
-          </span>
-        </div>
+        <Link to="/exchanges" className={styles.statCardLink}>
+          <div className={styles.statCard}>
+            <span className={`${styles.statIcon} ${styles.statOrange}`} aria-hidden><FiRepeat size={20} /></span>
+            <span className={styles.statValue}>{stats.exchanges_count}</span>
+            <span className={styles.statLabel}>
+              {isEn ? 'Active exchanges' : 'Активных обменов'}
+            </span>
+          </div>
+        </Link>
       </div>
 
       <h2 className={styles.quickTitle}>

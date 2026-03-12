@@ -6,6 +6,8 @@ import type {
   TokenResponse,
   FriendsResponse,
   DashboardStats,
+  Exchange,
+  ExchangeCreateBody,
 } from '@/types'
 
 const BASE_URL = 'https://mrfilldev-vinylhubback-5532.twc1.net'
@@ -186,12 +188,41 @@ export const api = {
     },
   },
 
-  userVinyl: (userId: string) =>
-    request<Vinyl[]>(`/api/v1/users/${userId}/vinyl`),
+  userVinyl: (
+    userId: string,
+    params?: { skip?: number; limit?: number; artist?: string; title?: string }
+  ) => {
+    const sp = new URLSearchParams()
+    if (params) {
+      if (params.skip != null) sp.set('skip', String(params.skip))
+      if (params.limit != null) sp.set('limit', String(params.limit))
+      if (params.artist) sp.set('artist', params.artist)
+      if (params.title) sp.set('title', params.title)
+    }
+    const q = sp.toString()
+    return request<Vinyl[]>(`/api/v1/users/${userId}/vinyl${q ? `?${q}` : ''}`)
+  },
   userVinylRecord: (userId: string, recordId: string) =>
     request<Vinyl>(`/api/v1/users/${userId}/vinyl/${recordId}`),
 
   dashboard: () => request<DashboardStats>('/api/v1/dashboard'),
+
+  exchanges: {
+    list: (status?: 'pending' | 'accepted' | 'rejected') => {
+      const q = status ? `?status=${status}` : ''
+      return request<Exchange[]>(`/api/v1/exchanges${q}`)
+    },
+    get: (id: string) => request<Exchange>(`/api/v1/exchanges/${id}`),
+    create: (body: ExchangeCreateBody) =>
+      request<Exchange>('/api/v1/exchanges', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    accept: (id: string) =>
+      request<Exchange>(`/api/v1/exchanges/${id}/accept`, { method: 'POST' }),
+    reject: (id: string) =>
+      request<Exchange>(`/api/v1/exchanges/${id}/reject`, { method: 'POST' }),
+  },
 
   metadata: {
     conditions: () => request<string[]>('/api/v1/metadata/conditions'),

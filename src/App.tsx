@@ -12,6 +12,7 @@ import { Friends } from '@/pages/Friends/Friends'
 import { FriendCollection } from '@/pages/FriendCollection/FriendCollection'
 import { FriendRecordDetail } from '@/pages/FriendRecordDetail/FriendRecordDetail'
 import { Exchanges } from '@/pages/Exchanges/Exchanges'
+import { ExchangeDetail } from '@/pages/ExchangeDetail/ExchangeDetail'
 import './App.css'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="friends/:userId/collection" element={<FriendCollection />} />
         <Route path="friends/:userId/collection/:recordId" element={<FriendRecordDetail />} />
         <Route path="exchanges" element={<Exchanges />} />
+        <Route path="exchanges/:exchangeId" element={<ExchangeDetail />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

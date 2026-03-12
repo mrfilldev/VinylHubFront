@@ -1,9 +1,13 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useCallback } from 'react'
 import { FiDisc } from 'react-icons/fi'
 import { api, getStaticUrl, ApiError } from '@/lib/api'
 import type { Vinyl, FriendItem } from '@/types'
 import styles from './FriendCollection.module.css'
+
+const DEFAULT_LIMIT = 20
+const DEBOUNCE_MS = 400
 
 const privacyLabels: Record<string, string> = {
   public: 'Публично',
@@ -11,8 +15,55 @@ const privacyLabels: Record<string, string> = {
   private: 'Приватно',
 }
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedValue(value), delay)
+    return () => clearTimeout(t)
+  }, [value, delay])
+  return debouncedValue
+}
+
 export function FriendCollection() {
   const { userId } = useParams<{ userId: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1)
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? String(DEFAULT_LIMIT), 10) || DEFAULT_LIMIT))
+  const [artistInput, setArtistInput] = useState(searchParams.get('artist') ?? '')
+  const [titleInput, setTitleInput] = useState(searchParams.get('title') ?? '')
+
+  const artist = useDebounce(artistInput.trim(), DEBOUNCE_MS)
+  const title = useDebounce(titleInput.trim(), DEBOUNCE_MS)
+
+  const skip = (page - 1) * limit
+
+  const setPage = useCallback(
+    (newPage: number) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev)
+        if (newPage <= 1) next.delete('page')
+        else next.set('page', String(newPage))
+        return next
+      })
+    },
+    [setSearchParams]
+  )
+
+  useEffect(() => {
+    const prevArtist = searchParams.get('artist') ?? ''
+    const prevTitle = searchParams.get('title') ?? ''
+    if (artist === prevArtist && title === prevTitle) return
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (artist) next.set('artist', artist)
+      else next.delete('artist')
+      if (title) next.set('title', title)
+      else next.delete('title')
+      next.delete('page')
+      return next
+    })
+  }, [artist, title, searchParams])
 
   const { data: friend } = useQuery({
     queryKey: ['friend', userId],
@@ -25,10 +76,14 @@ export function FriendCollection() {
   })
 
   const { data: records = [], isLoading, error } = useQuery({
-    queryKey: ['user-vinyl', userId],
-    queryFn: () => api.userVinyl(userId!),
+    queryKey: ['user-vinyl', userId, skip, limit, artist, title],
+    queryFn: () =>
+      api.userVinyl(userId!, { skip, limit, ...(artist && { artist }), ...(title && { title }) }),
     enabled: !!userId,
   })
+
+  const hasNext = records.length === limit
+  const hasPrev = page > 1
 
   if (!userId) {
     return (
@@ -76,6 +131,8 @@ export function FriendCollection() {
     )
   }
 
+  const emptyByFilter = (artist || title) && records.length === 0 && !isLoading
+
   return (
     <div className={styles.wrap}>
       <div className={styles.nav}>
@@ -85,18 +142,67 @@ export function FriendCollection() {
       <h1 className={styles.title}>
         Коллекция {friend?.username ?? userId}
       </h1>
+
+      <div className={styles.filters}>
+        <label className={styles.filterLabel}>
+          <span>Исполнитель</span>
+          <input
+            type="search"
+            placeholder="Фильтр по исполнителю"
+            value={artistInput}
+            onChange={(e) => setArtistInput(e.target.value)}
+            className={styles.filterInput}
+          />
+        </label>
+        <label className={styles.filterLabel}>
+          <span>Название</span>
+          <input
+            type="search"
+            placeholder="Фильтр по названию"
+            value={titleInput}
+            onChange={(e) => setTitleInput(e.target.value)}
+            className={styles.filterInput}
+          />
+        </label>
+      </div>
+
       {isLoading ? (
         <div className={styles.spinner} aria-label="Загрузка" />
       ) : records.length === 0 ? (
         <p className={styles.empty}>
-          У пользователя пока нет пластинок в коллекции (или нет записей, видимых для друзей).
+          {emptyByFilter
+            ? 'Ничего не найдено по заданным фильтрам.'
+            : 'У пользователя пока нет пластинок в коллекции (или нет записей, видимых для друзей).'}
         </p>
       ) : (
-        <div className={styles.grid}>
-          {records.map((record) => (
-            <RecordCard key={record.id} userId={userId} record={record} />
-          ))}
-        </div>
+        <>
+          <div className={styles.grid}>
+            {records.map((record) => (
+              <RecordCard key={record.id} userId={userId} record={record} />
+            ))}
+          </div>
+          <div className={styles.pagination}>
+            <button
+              type="button"
+              className={styles.pageBtn}
+              disabled={!hasPrev}
+              onClick={() => setPage(page - 1)}
+            >
+              ← Назад
+            </button>
+            <span className={styles.pageInfo}>
+              Страница {page}
+            </span>
+            <button
+              type="button"
+              className={styles.pageBtn}
+              disabled={!hasNext}
+              onClick={() => setPage(page + 1)}
+            >
+              Вперёд →
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

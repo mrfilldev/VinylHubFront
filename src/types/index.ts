@@ -88,6 +88,34 @@ export interface DashboardStats {
   exchanges_count: number
 }
 
+// Exchanges
+export interface VinylSummary {
+  id: string
+  artist: string
+  title: string
+  cover_image_url?: string | null
+}
+
+export interface Exchange {
+  id: string
+  from_user_id: string
+  from_vinyl_id: string
+  to_user_id: string
+  to_vinyl_id: string
+  status: 'pending' | 'accepted' | 'rejected'
+  created_at: string
+  from_vinyl: VinylSummary
+  to_vinyl: VinylSummary
+  from_username: string
+  to_username: string
+}
+
+export interface ExchangeCreateBody {
+  from_vinyl_id: string
+  to_user_id: string
+  to_vinyl_id: string
+}
+
 // User update
 export interface UserUpdateBody {
   username?: string
