@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { FiSearch, FiUser } from 'react-icons/fi'
 import { api } from '@/lib/api'
+import type { FriendItem, IncomingInvitation, OutgoingInvitation } from '@/types'
 import styles from './Friends.module.css'
 
 type Tab = 'friends' | 'incoming' | 'outgoing'
@@ -123,7 +124,7 @@ export function Friends() {
               {friends.length === 0 ? (
                 <li className={styles.empty}>Список друзей пуст</li>
               ) : (
-                friends.map((f) => (
+                friends.map((f: FriendItem) => (
                   <li key={f.id} className={styles.item}>
                     <FiUser className={styles.userIcon} aria-hidden />
                     <Link to={`/friends/${f.id}/collection`} className={styles.name}>
@@ -147,7 +148,7 @@ export function Friends() {
               {incoming.length === 0 ? (
                 <li className={styles.empty}>Нет входящих заявок</li>
               ) : (
-                incoming.map((inv) => (
+                incoming.map((inv: IncomingInvitation) => (
                   <li key={inv.id} className={styles.item}>
                     <FiUser className={styles.userIcon} aria-hidden />
                     <Link to={`/friends/${inv.from_user_id}/collection`} className={styles.name}>
@@ -181,7 +182,7 @@ export function Friends() {
               {outgoing.length === 0 ? (
                 <li className={styles.empty}>Нет исходящих заявок</li>
               ) : (
-                outgoing.map((inv) => (
+                outgoing.map((inv: OutgoingInvitation) => (
                   <li key={inv.id} className={styles.item}>
                     <FiUser className={styles.userIcon} aria-hidden />
                     <span className={styles.name}>{inv.to_username}</span>

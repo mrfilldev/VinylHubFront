@@ -1,4 +1,12 @@
-import type { User, UserUpdateBody, Vinyl, VinylCreate } from '@/types'
+import type {
+  User,
+  UserUpdateBody,
+  Vinyl,
+  VinylCreate,
+  TokenResponse,
+  FriendsResponse,
+  DashboardStats,
+} from '@/types'
 
 const BASE_URL = 'https://mrfilldev-vinylhubback-5532.twc1.net'
 

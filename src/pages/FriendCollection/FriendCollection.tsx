@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { FiDisc } from 'react-icons/fi'
 import { api, getStaticUrl } from '@/lib/api'
-import type { Vinyl } from '@/types'
+import type { Vinyl, FriendItem } from '@/types'
 import styles from './FriendCollection.module.css'
 
 const privacyLabels: Record<string, string> = {
@@ -18,7 +18,7 @@ export function FriendCollection() {
     queryKey: ['user', userId],
     queryFn: async () => {
       const list = await api.friends.list()
-      const friend = list.friends.find((f) => f.id === userId)
+      const friend = list.friends.find((f: FriendItem) => f.id === userId)
       return friend ?? null
     },
     enabled: !!userId,

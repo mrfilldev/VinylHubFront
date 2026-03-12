@@ -47,6 +47,7 @@ export function Profile() {
   }
 
   function startEdit() {
+    if (!user) return
     setUsername(user.username)
     setBio(user.bio ?? '')
     setLanguage(user.language ?? 'ru')
