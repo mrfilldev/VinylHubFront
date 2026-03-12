@@ -10,6 +10,7 @@ import { RecordDetail } from '@/pages/RecordDetail/RecordDetail'
 import { RecordForm } from '@/pages/RecordForm/RecordForm'
 import { Friends } from '@/pages/Friends/Friends'
 import { FriendCollection } from '@/pages/FriendCollection/FriendCollection'
+import { FriendRecordDetail } from '@/pages/FriendRecordDetail/FriendRecordDetail'
 import { Exchanges } from '@/pages/Exchanges/Exchanges'
 import './App.css'
 
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="collection/:id/edit" element={<RecordForm />} />
         <Route path="friends" element={<Friends />} />
         <Route path="friends/:userId/collection" element={<FriendCollection />} />
+        <Route path="friends/:userId/collection/:recordId" element={<FriendRecordDetail />} />
         <Route path="exchanges" element={<Exchanges />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

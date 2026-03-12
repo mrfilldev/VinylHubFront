@@ -32,6 +32,16 @@ export function getStaticUrl(path: string): string {
   return `${base}${p}`
 }
 
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit & { skipAuth?: boolean } = {}
@@ -75,7 +85,7 @@ async function request<T>(
       : typeof data.detail === 'string'
         ? data.detail
         : 'Ошибка запроса'
-    throw new Error(message || `HTTP ${res.status}`)
+    throw new ApiError(res.status, message || `HTTP ${res.status}`)
   }
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
@@ -178,6 +188,8 @@ export const api = {
 
   userVinyl: (userId: string) =>
     request<Vinyl[]>(`/api/v1/users/${userId}/vinyl`),
+  userVinylRecord: (userId: string, recordId: string) =>
+    request<Vinyl>(`/api/v1/users/${userId}/vinyl/${recordId}`),
 
   dashboard: () => request<DashboardStats>('/api/v1/dashboard'),
 

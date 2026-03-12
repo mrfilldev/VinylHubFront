@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { FiDisc } from 'react-icons/fi'
-import { api, getStaticUrl } from '@/lib/api'
+import { api, getStaticUrl, ApiError } from '@/lib/api'
 import type { Vinyl, FriendItem } from '@/types'
 import styles from './FriendCollection.module.css'
 
@@ -14,12 +14,12 @@ const privacyLabels: Record<string, string> = {
 export function FriendCollection() {
   const { userId } = useParams<{ userId: string }>()
 
-  const { data: user } = useQuery({
-    queryKey: ['user', userId],
+  const { data: friend } = useQuery({
+    queryKey: ['friend', userId],
     queryFn: async () => {
       const list = await api.friends.list()
-      const friend = list.friends.find((f: FriendItem) => f.id === userId)
-      return friend ?? null
+      const f = list.friends.find((x: FriendItem) => x.id === userId)
+      return f ?? null
     },
     enabled: !!userId,
   })
@@ -39,10 +39,38 @@ export function FriendCollection() {
     )
   }
 
+  const apiError = error instanceof ApiError ? error : null
+  if (apiError?.status === 400) {
+    return (
+      <div className={styles.wrap}>
+        <p className={styles.error}>
+          Для своей коллекции используйте раздел «Моя коллекция».
+        </p>
+        <Link to="/collection">Перейти в мою коллекцию</Link>
+      </div>
+    )
+  }
+  if (apiError?.status === 403) {
+    return (
+      <div className={styles.wrap}>
+        <p className={styles.error}>
+          Вы не в друзьях с этим пользователем. Коллекция доступна только друзьям.
+        </p>
+        <p className={styles.hint}>
+          Отправьте заявку в друзья со страницы друзей или вернитесь назад.
+        </p>
+        <div className={styles.actions}>
+          <Link to="/friends">← К списку друзей</Link>
+        </div>
+      </div>
+    )
+  }
   if (error) {
     return (
       <div className={styles.wrap}>
-        <p className={styles.error}>Не удалось загрузить коллекцию (возможно, пользователь не в друзьях).</p>
+        <p className={styles.error}>
+          Не удалось загрузить коллекцию. Проверьте подключение и попробуйте ещё раз.
+        </p>
         <Link to="/friends">← Друзья</Link>
       </div>
     )
@@ -50,18 +78,23 @@ export function FriendCollection() {
 
   return (
     <div className={styles.wrap}>
-      <Link to="/friends" className={styles.back}>← Друзья</Link>
+      <div className={styles.nav}>
+        <Link to="/friends" className={styles.back}>← Друзья</Link>
+        <Link to="/collection" className={styles.myCollection}>Моя коллекция</Link>
+      </div>
       <h1 className={styles.title}>
-        Коллекция {user?.username ?? userId}
+        Коллекция {friend?.username ?? userId}
       </h1>
       {isLoading ? (
         <div className={styles.spinner} aria-label="Загрузка" />
       ) : records.length === 0 ? (
-        <p className={styles.empty}>В коллекции пока нет пластинок.</p>
+        <p className={styles.empty}>
+          У пользователя пока нет пластинок в коллекции (или нет записей, видимых для друзей).
+        </p>
       ) : (
         <div className={styles.grid}>
           {records.map((record) => (
-            <RecordCard key={record.id} record={record} />
+            <RecordCard key={record.id} userId={userId} record={record} />
           ))}
         </div>
       )}
@@ -69,12 +102,12 @@ export function FriendCollection() {
   )
 }
 
-function RecordCard({ record }: { record: Vinyl }) {
+function RecordCard({ userId, record }: { userId: string; record: Vinyl }) {
   const privacy = record.privacy_level ? privacyLabels[record.privacy_level] ?? record.privacy_level : ''
   const coverUrl = record.cover_image_url ? getStaticUrl(record.cover_image_url) : null
 
   return (
-    <div className={styles.card}>
+    <Link to={`/friends/${userId}/collection/${record.id}`} className={styles.card}>
       <div className={styles.coverWrap}>
         {coverUrl ? (
           <img src={coverUrl} alt="" className={styles.cover} />
@@ -88,6 +121,6 @@ function RecordCard({ record }: { record: Vinyl }) {
         <span className={styles.artist}>{record.artist}</span>
         {record.year != null && <span className={styles.year}>{record.year}</span>}
       </div>
-    </div>
+    </Link>
   )
 }
